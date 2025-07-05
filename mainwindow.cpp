@@ -9023,6 +9023,12 @@ void MainWindow::processCommandActivity() {
         // PROCESS ACTIVE HEARTBEAT
         // if we have hb mode enabled and auto reply enabled <del>and auto ack enabled and no callsign is selected</del> update: if we're in HB mode, doesn't matter if a callsign is selected.
         else if ((d.cmd == " HB" || d.cmd == " HEARTBEAT") && canCurrentModeSendHeartbeat() && ui->actionModeJS8HB->isChecked() && ui->actionModeAutoreply->isChecked() && ui->actionHeartbeatAcknowledgements->isChecked()){
+            // do not process HB activity if buffer is not empty, this prevents broken incoming MSG's
+            if (!m_messageBuffer.isEmpty()){
+                qDebug() << "hb paused for messageBuffer";
+                continue;
+            }
+
             // check to make sure we aren't pausing HB transmissions (ACKs) while a callsign is selected
             if(m_config.heartbeat_qso_pause() && !selectedCallsign.isEmpty()){
                 qDebug() << "hb paused during qso";
